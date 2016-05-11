@@ -1,7 +1,3 @@
-#!/usr/bin/python
-
-
-
 #!/usr/bin/env python
 
 import serial, sys
@@ -17,6 +13,8 @@ ser = serial.Serial(
     bytesize=serial.EIGHTBITS
 )
 
+ser.setRTS(True)
+ser.setDTR(False)
 
 ser.isOpen()
 ser.close()             # close port
