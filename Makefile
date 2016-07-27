@@ -22,7 +22,8 @@ CLOCK      = 8000000
 PROGRAMMER = -c avr109
 OBJECTS    = main.o
 #FUSES      = -U lfuse:w:0x5e:m -U hfuse:w:0x91:m -U efuse:w:0xf3:m
-PORT		= /dev/ttyACM1
+PORT       = /dev/ttyACM1
+BITRATE    = 57600
 
 # For computing fuse byte values for other devices and options see
 # the fuse bit calculator at http://www.engbedded.com/fusecalc/
@@ -30,7 +31,7 @@ PORT		= /dev/ttyACM1
 
 # Tune the lines below only if you know what you are doing:
 
-AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)  -P $(PORT) -b57600 -D 
+AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE) -P $(PORT) -b ${BITRATE} -D 
 COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
 
 # symbolic targets:
@@ -50,6 +51,8 @@ all:	main.hex
 	$(COMPILE) -S $< -o $@
 
 flash:	all
+        reset.py $(PORT)
+        sleep 1.5
 	$(AVRDUDE) -U flash:w:main.hex:i
 
 fuse:
@@ -64,16 +67,6 @@ load: all
 
 clean:
 	rm -f main.hex main.elf $(OBJECTS)
-
-program:
-	python reset.py $(PORT)
-	sleep 1.5
-	$(AVRDUDE) -U flash:w:main.hex:i
-
-burn:
-	#python reset.py $(PORT)
-	#sleep 2
-	avrdude -patmega32u4 -cavr109 -P$(PORT) -b57600 -D -Uflash:w:./Blink.cpp.hex:i 
 
 # file targets:
 main.elf: $(OBJECTS)
